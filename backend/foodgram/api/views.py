@@ -45,6 +45,17 @@ class UserViewSet(mixins.CreateModelMixin,
         serializer = UserReadSerializer(request.user)
         return Response(serializer.data,
                         status=status.HTTP_200_OK)
+    
+    @action(detail=True, methods=['get'], permission_classes=(AllowAny,))
+    def recipes(self, request, pk=None):
+        user = get_object_or_404(User, pk=pk)
+        recipes = user.recipes.all()
+        limit = request.query_params.get('recipes_limit')
+        if limit:
+            recipes = recipes[:int(limit)]
+        serializer = RecipeSerializer(recipes, many=True, context={'request': request})
+        return Response(serializer.data)
+
 
     @action(detail=False, methods=['post'],
             permission_classes=(IsAuthenticated,))
@@ -144,6 +155,26 @@ class RecipeViewSet(viewsets.ModelViewSet):
                               recipe=recipe).delete()
             return Response({'detail': 'Рецепт успешно удален из избранного.'},
                             status=status.HTTP_204_NO_CONTENT)
+        
+    @action(detail=False, methods=['get'],
+        permission_classes=(IsAuthenticated,))
+    def download_shopping_cart(self, request):
+        ingredients = (
+            Recipe_ingredient.objects
+            .filter(recipe__shopping_recipe__user=request.user)
+            .values('ingredient')
+            .annotate(total_amount=Sum('amount'))
+            .values_list('ingredient__name', 'total_amount',
+                        'ingredient__measurement_unit')
+        )
+        file_list = []
+        for name, amount, unit in ingredients:
+            file_list.append(f'{name} - {amount} {unit}.')
+        file = HttpResponse('Список покупок:\n' + '\n'.join(file_list),
+                            content_type='text/plain')
+        file['Content-Disposition'] = f'attachment; filename={FILE_NAME}'
+        return file
+
 
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=(IsAuthenticated,),
@@ -170,6 +201,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 {'detail': 'Рецепт успешно удален из списка покупок.'},
                 status=status.HTTP_204_NO_CONTENT
             )
+    
 
     @action(detail=False, methods=['get'],
             permission_classes=(IsAuthenticated,))

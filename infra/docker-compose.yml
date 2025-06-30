@@ -8,7 +8,7 @@ services:
       POSTGRES_USER: amina
       POSTGRES_PASSWORD: 1919
     ports:
-      - "5433:5432"  # Переадресуем на свободный порт, чтобы избежать конфликта
+      - "5433:5432" 
     volumes:
       - db_value:/var/lib/postgresql/data
     healthcheck:

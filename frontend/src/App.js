@@ -7,6 +7,9 @@ import api from './api'
 import styles from './styles.module.css'
 import cn from 'classnames'
 import hamburgerImg from './images/hamburger-menu.png'
+import RequestResetPassword from './pages/RequestResetPassword'
+import ResetPasswordConfirm from './pages/ResetPasswordConfirm'
+
 
 import {
   Main,
@@ -253,6 +256,7 @@ function App() {
           </Route>
 
 
+
           <Route exact path='/signin'>
             <SignIn
               onSignIn={authorization}
@@ -265,6 +269,18 @@ function App() {
           </Route>
           <Route path='/'>
             {loggedIn ? <Redirect to='/recipes' /> : <Redirect to='/signin'/>}
+          </Route>
+
+          <Route exact path='/reset-password'>
+            <RequestResetPassword />
+          </Route>
+
+          <Route exact path='/reset-password-confirm/:uid/:token'>
+            <ResetPasswordConfirm />
+          </Route>
+
+          <Route exact path='/'>
+            {loggedIn ? <Redirect to='/recipes' /> : <Redirect to='/signin' />}
           </Route>
         </Switch>
         <Footer />

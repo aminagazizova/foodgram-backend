@@ -1,0 +1,13 @@
+для проверки:
+
+№1 эндпоинты:
+1) http://localhost/api/users/<user_id>/recipes/ (для айди - http://localhost/api/users/)
+2)http://localhost/api/users/me/
+3)http://localhost/api/ingredients/?search=
+
+№2 Через Github
+http://localhost/oauth/complete/github/
+
+№3
+
+
